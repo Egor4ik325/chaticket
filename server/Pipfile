@@ -8,6 +8,7 @@ django = "*"
 channels = "*"
 django-environ = "*"
 channels-redis = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 pylint = "*"
