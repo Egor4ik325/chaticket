@@ -87,8 +87,8 @@ DATABASES = {
     # PostgreSQL running on Docker
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'localhost',
-        'PORT': 6543,
+        'HOST': 'db',
+        'PORT': 5432,
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
@@ -153,8 +153,8 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         # Channels configuration
         'CONFIG': {
-            # redis://localhost:6379
-            'hosts': [('127.0.0.1', 6379)],
+            # redis://redis:6379
+            'hosts': [('redis', 6379)],
         },
     }
 }
