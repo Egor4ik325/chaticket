@@ -20,6 +20,7 @@ cryptography==3.4.8; python_version >= '3.6'
 daphne==3.0.2; python_version >= '3.6'
 django-environ==0.7.0
 django==3.2.7
+djangorestframework==3.12.4
 hiredis==2.0.0; python_version >= '3.6'
 hyperlink==21.0.0
 idna==3.2

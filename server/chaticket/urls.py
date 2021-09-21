@@ -21,6 +21,7 @@ import chats.routing
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
 ]
 
 websocket_patterns = chats.routing.websocket_urlpatterns

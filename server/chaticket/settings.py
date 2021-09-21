@@ -43,17 +43,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'api',
+    'authentication',
     'users',
     'chats',
 
     'channels',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # always verify CSRF cookies
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -158,3 +161,23 @@ CHANNEL_LAYERS = {
         },
     }
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
+
+# Cross-site (cross-origin) request forgery protection
+CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# * Cookies will be access by JavaScript in order to set X-CSRFToken header
+# Small protection from cross-site scripting (JavaScript injection)
+# Hide cookies from JavaScript and DevTools
+# CSRF_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_HTTPONLY = True
