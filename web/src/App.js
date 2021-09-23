@@ -1,62 +1,79 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import { Container, Image, Form, FormControl } from "react-bootstrap";
+import React, { Fragment, useEffect, useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Link,
+  Switch,
+  Route
+} from "react-router-dom";
+import { Container, Image, Button } from "react-bootstrap";
 
-const chatSocket = new WebSocket('ws://localhost/ws/chats/default/')
+import { Chat, Login, Register } from "./components";
+import logo from './logo.svg';
+import { getUser, logout } from "./adaptors"
+
 
 function App() {
-  const [log, setLog] = useState('');
-  const [message, setMessage] = useState('');
+  // Currect session (logged-in) user
+  const [user, setUser] = useState(null);
 
-  chatSocket.onmessage = e => {
-    const data = JSON.parse(e.data);
-    setLog(log + data.message + '\n');
+  const update = async () => {
+    // Fetch & set session user
+    getUser().then(setUser);
   }
 
-  chatSocket.onclose = e => {
-    console.error("WebSocket error!");
+  const handleLogout = async () => {
+    await logout();
+    await update();
   }
 
   useEffect(() => {
-
-  }, [setLog, setMessage]);
-
-  // const [room, setRoom] = useState(null);
-  // const [chat, setChat] = useState(false);
-
-  // const handleSubmit = e => {
-  //   e.preventDefault();
-  //   setChat(true);
-  // }
-
-  // const handleChange = e => {
-  //   setRoom(e.target.value);
-  // }
-
-  const handleSubmit = e => {
-    e.preventDefault();
-
-    // Send message
-    chatSocket.send(JSON.stringify({ 'message': message }));
-    setMessage('');
-  }
-
-  const handleChange = e => {
-    e.preventDefault();
-    setMessage(e.target.value);
-  }
+    update();
+  }, [update]);
 
   return (
-    <Container>
-      <Image src={logo} width={64} height={64} />
-      <p>Hello, World!</p>
-
-      <Form onSubmit={handleSubmit}>
-        <FormControl as="textarea" type="text" id="log" value={log} />
-        <FormControl type="text" onChange={handleChange} />
-        <FormControl type="submit" value="Send" />
-      </Form>
-    </Container>
+    <Router>
+      <Container>
+        {/* Static content */}
+        <Image src={logo} width={64} height={64} />
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/chat">Chat</Link></li>
+          {
+            user ?
+              <Fragment>
+                <div>Hello, <b>{user.username}</b>!</div>
+                <Button type="button" variant="dark" onClick={handleLogout}>Logout</Button>
+              </Fragment>
+              :
+              <Fragment>
+                <li><Link to="/login">Login</Link></li>
+                <li><Link to="/register">Register</Link></li>
+              </Fragment>
+          }
+        </ul>
+        <hr />
+        {/* Dynamic content */}
+        <Switch>
+          <Route exact path="/">
+            <p>
+              Chaticket – real-time chat webapp.
+            </p>
+          </Route>
+          <Route path="/chat">
+            <Chat />
+          </Route>
+          <Route path="/login">
+            <Login update={update} />
+          </Route>
+          <Route path="/register">
+            <Register />
+          </Route>
+        </Switch>
+        {/* Static content */}
+        <hr />
+        <p>Some footer.</p>
+      </Container>
+    </Router>
   );
 }
 
