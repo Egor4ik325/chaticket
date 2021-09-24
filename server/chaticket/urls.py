@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 import chats.routing
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/admin/', admin.site.urls),
     path('api/', include('api.urls')),
 ]
 
