@@ -6,6 +6,12 @@ export {
     LOGOUT_URL,
 } from "./Authentication";
 
+export {
+    CHAT_URL
+} from "./Chat";
+
+export { USERS_URL } from "./User";
+
 export const HOME_PATH = "/";
 export const CHAT_PATH = "/chat";
 export const LOGIN_PATH = "/login";

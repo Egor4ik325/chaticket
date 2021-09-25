@@ -1,44 +1,30 @@
-import React, { useState } from "react";
-import { Form, FormControl } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router";
 
-const chatSocket = new WebSocket('ws://localhost/ws/chats/default/')
+import Messages from "./Messages";
+import { chatRetrieve } from "../adaptors";
 
-const Chat = props => {
-    const [log, setLog] = useState('');
-    const [message, setMessage] = useState('');
+export default function Chat() {
+    const [chat, setChat] = useState(null);
+    const { id } = useParams();
 
-    chatSocket.onmessage = e => {
-        const data = JSON.parse(e.data);
-        setLog(log + data.message + '\n');
+    useEffect(() => {
+        chatRetrieve(id).then(setChat);
+    }, [setChat]);
+
+    const render = () => {
+        if (chat) {
+            return (
+                <div>
+                    <h3>{chat.full_name}</h3>
+                    <p>{chat.name}</p>
+                    <Messages />
+                </div>
+            )
+        }
+
+        return <p>Loading...</p>
     }
 
-    chatSocket.onclose = e => {
-        console.error("WebSocket error!");
-    }
-
-    // useEffect(() => {
-
-    // }, [setLog, setMessage]);
-
-    const handleSubmit = e => {
-        e.preventDefault();
-
-        // Send message
-        chatSocket.send(JSON.stringify({ 'message': message }));
-        setMessage('');
-    }
-
-    const handleChange = e => {
-        e.preventDefault();
-        setMessage(e.target.value);
-    }
-
-    return (
-        <Form onSubmit={handleSubmit}>
-            <FormControl as="textarea" type="text" id="log" value={log} />
-            <FormControl type="text" onChange={handleChange} />
-            <FormControl type="submit" value="Send" />
-        </Form>
-    );
+    return render();
 }
-export default Chat;
