@@ -15,6 +15,7 @@ djangorestframework = "*"
 pylint = "*"
 autopep8 = "*"
 selenium = "*"
+rope = "*"
 
 [requires]
 python_version = "3.9"
