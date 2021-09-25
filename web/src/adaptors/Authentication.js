@@ -1,16 +1,9 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-import { CSRF_URL, USER_URL, LOGIN_URL, REGISTER_URL, LOGOUT_URL } from "../constants";
+import { USER_URL, LOGIN_URL, REGISTER_URL, LOGOUT_URL } from "../constants";
+import { setCsrfCookie } from "./Api";
 
-export const setCsrfCookie = async () => {
-    try {
-        // Set csrftoken cookie
-        await axios.get(CSRF_URL);
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 export const getUser = async () => {
     try {

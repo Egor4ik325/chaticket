@@ -33,11 +33,12 @@ I want it to look similar to the **Telegram web** client app: similar look and f
 
 Committed branch features:
 
-- [ ] Setup basic project (follow tutorial)
-
-- [ ] Write tests
-
-- [ ] Deploy
+- [x] Authentication
+- [ ] Store chats and messages in the persistant storage
+- [ ] Profile
+- [ ] Make chat-looking UI
+- [ ] Real-time capabilities
+- [ ] Messages features
 
 ### This project features
 
@@ -60,6 +61,11 @@ Features that might appear in this project:
 - Production-ready
 
 > Keep the number of features short but enough
+
+#### Chats
+
+Users can create, update, view and delete chats. Chat will have a name (used to search for chat)
+and a full chat name. User won't be able to cat on the object if he is not it's creator.
 
 ### This project goals
 

@@ -1,6 +1,6 @@
-const API_URL = 'http://localhost/api/';
-const AUTH_URL = API_URL + 'auth/';
+import { API_URL } from "./Api";
 
+const AUTH_URL = API_URL + 'auth/';
 export const CSRF_URL = AUTH_URL + 'set-csrf-cookie/';
 export const USER_URL = AUTH_URL + 'user/';
 export const LOGIN_URL = AUTH_URL + 'login/';

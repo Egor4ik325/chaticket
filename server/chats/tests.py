@@ -1,105 +1,109 @@
-from channels.testing import ChannelsLiveServerTestCase
-from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.wait import WebDriverWait
+from django.shortcuts import reverse
+
+from rest_framework.test import APITestCase
+from rest_framework import status
+
+from .models import Chat
+from users.models import CustomUser
 
 
-class ChatTests(ChannelsLiveServerTestCase):
-    """
-    End-to-end chat browser tests using Selenium.
+class ChatAPITestCase(APITestCase):
+    def _create_user(self):
+        self.username = 'testuser'
+        self.password = 'testpassword'
+        self.email = 'test@email.com'
+        self.user = CustomUser.objects.create_user(
+            username=self.username, email=self.email, password=self.password
+        )
 
-    Test:
-    - consumers
-    - routing
-    """
-    serve_static = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        try:
-            # Requires geckodriver in $PATH
-            cls.driver = webdriver.Firefox()
-        except:
-            super().tearDownClass()
-            raise
+class ChatListAPITests(ChatAPITestCase):
+    """Assert API list route is working properly."""
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
-        super().tearDownClass()
+    def setUp(self):
+        """Initial state for all tests."""
+        self._create_user()
 
-    def test_when_chat_message_posted_then_seen_by_everyone_in_room(self):
-        try:
-            self._enter_chat_room('room_1')
+        # Create test chats
+        self.chat1 = Chat.objects.create(
+            creator=self.user, name="testchat", full_name="Test Chat", public=True)
+        self.chat2 = Chat.objects.create(
+            creator=self.user, name="nicechat", full_name="Nice Chat", public=False)
 
-            self._open_new_window()
-            self._enter_chat_room('room_1')
+        self.list_url = reverse('chat-list')
 
-            self._switch_to_window(0)
-            self._post_message('hello')
-            WebDriverWait(self.driver, 2).until(
-                lambda _: 'hello' in self._chat_log_value,
-                "Message was not received by window 1 from 1"
-            )
-            self._switch_to_window(1)
-            WebDriverWait(self.driver, 2).until(
-                lambda _: 'hello' in self._chat_log_value,
-                "Message was not received by window 2 from 1"
-            )
-        finally:
-            self._close_all_new_windows()
+    def test_positive_authenticated_list_all_chats(self):
+        self.client.login(username=self.username,
+                          email=self.email, password=self.password)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
 
-    def test_when_chat_message_posted_then_not_seen_in_different_room(self):
-        try:
-            self._enter_chat_room('room_1')
+    def test_negative_unauthenticated_not_list_chats(self):
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-            self._open_new_window()
-            self._enter_chat_room('room_2')
 
-            self._switch_to_window(0)
-            self._post_message('hello')
-            WebDriverWait(self.driver, 2).until(
-                lambda _: 'hello' in self._chat_log_value,
-                "Message was not received by window 1 from 1"
-            )
-            self._switch_to_window(1)
-            self._post_message('world')
-            WebDriverWait(self.driver, 2).until(
-                lambda _: 'world' in self._chat_log_value,
-                "Message was not received by window 2 from 2"
-            )
-            self.assertTrue('hello' not in self._chat_log_value,
-                            "Message was received by window 2 from 1")
-        finally:
-            self._close_all_new_windows()
+class ChatCreateAPITests(ChatAPITestCase):
+    def setUp(self):
+        self._create_user()
 
-    # Utility test functions(common shorthands)
+        self.create_url = reverse('chat-list')
 
-    def _enter_chat_room(self, room_name):
-        self.driver.get(self.live_server_url + 'chats/')
-        ActionChains(self.driver).send_keys(room_name + '\n').perform()
-        WebDriverWait(self.driver, 2).until(
-            lambda _: room_name in self.driver.current_url)
+    def test_positive_create_chat(self):
+        self.client.login(username=self.username, password=self.password)
 
-    def _open_new_window(self):
-        self.driver.execute_script('window.open("about:blank", "_blank");')
-        self._switch_to_window(-1)
+        data = {
+            'name': 'nice_chat',
+            'full_name': 'Very Sweet Chat',
+            'public': True,
+        }
+        response = self.client.post(self.create_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def _close_all_new_windows(self):
-        while len(self.driver.window_handles) > 1:
-            self._switch_to_window(-1)
-            self.driver.execute_script('window.close();')
 
-        if len(self.driver.window_handles) == 1:
-            self._switch_to_window(0)
+class ChatRetrieveAPITests(ChatAPITestCase):
+    def setUp(self):
+        self._create_user()
 
-    def _switch_to_window(self, window_index):
-        self.driver.switch_to_window(self.driver.window_handles[window_index])
+        self.chat = Chat.objects.create(
+            creator=self.user, name="testchat", full_name="Test chat")
 
-    def _post_message(self, message):
-        ActionChains(self.driver).send_keys(message + '\n').perform()
+        self.retrieve_url = self.chat.get_absolute_url()
 
-    @property
-    def _chat_log_value(self):
-        return self.driver.find_element_by_css_selector('#chat-log').get_property('value')
+    def test_positive_retrive_existing_chat(self):
+        # Arrange
+        self.client.login(username=self.username, password=self.password)
+
+        # Act
+        response = self.client.get(self.retrieve_url)
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class ChatUpdateAPITests(ChatAPITestCase):
+    def setUp(self):
+        self._create_user()
+        self.chat = Chat.objects.create(
+            creator=self.user, name="testchat", full_name="Test chat")
+        self.detail_url = self.chat.get_absolute_url()
+
+    def test_positive_update_chat_name(self):
+        self.client.login(username=self.username, password=self.password)
+        data = {'name': 'testing_chat'}
+        response = self.client.patch(self.detail_url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class ChatDestroyAPITests(ChatAPITestCase):
+    def setUp(self):
+        self._create_user()
+        self.chat = Chat.objects.create(
+            creator=self.user, name="testchat", full_name="Test chat")
+        self.chat_url = self.chat.get_absolute_url()
+
+    def test_positive_destroy_existing_chat_working(self):
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.delete(self.chat_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
