@@ -13,15 +13,17 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 
-from .urls import websocket_patterns
+import channels
+
+from .urls import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chaticket.settings')
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
 
-    # WebSocket handler
+    # WebSocket handler (requires client session cookie)
     'websocket': AuthMiddlewareStack(
-        URLRouter(websocket_patterns)
-    )
+        URLRouter(websocket_urlpatterns)
+    ),
 })

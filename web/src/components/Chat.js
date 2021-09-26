@@ -18,7 +18,7 @@ export default function Chat() {
                 <div>
                     <h3>{chat.full_name}</h3>
                     <p>{chat.name}</p>
-                    <Messages />
+                    <Messages id={id} />
                 </div>
             )
         }

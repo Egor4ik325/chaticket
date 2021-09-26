@@ -17,11 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 
-import chats.routing
+import message.routing
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/', include('api.urls')),
 ]
 
-websocket_patterns = chats.routing.websocket_urlpatterns
+websocket_urlpatterns = message.routing.websocket_urlpatterns

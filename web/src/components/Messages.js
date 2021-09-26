@@ -1,46 +1,50 @@
-import React, { useState } from "react";
+import React, { Component, useState } from "react";
 import { Form, FormControl } from "react-bootstrap";
 
-const chatSocket = new WebSocket('ws://localhost/ws/chats/default/')
 
-const Messages = props => {
-    const [log, setLog] = useState('');
-    const [message, setMessage] = useState('');
+class Messages extends Component {
+    constructor(props) {
+        super(props);
 
-    chatSocket.onmessage = e => {
-        const data = JSON.parse(e.data);
-        setLog(log + data.message + '\n');
+        // Make a chat connection to transfer messages
+        this.chatSocket = new WebSocket(`ws://localhost/ws/chats/${props.id}/`);
+
+        this.state = {
+            log: '',
+            body: ''
+        }
+
+        this.chatSocket.onmessage = e => {
+            const data = JSON.parse(e.data);
+            this.setState({ log: this.state.log + data.body + '\n' });
+        }
+
+        this.chatSocket.onclose = e => {
+            console.error("WebSocket error!");
+        }
     }
 
-    chatSocket.onclose = e => {
-        console.error("WebSocket error!");
-    }
-
-    // useEffect(() => {
-
-    // }, [setLog, setMessage]);
-
-    const handleSubmit = e => {
+    handleSubmit = e => {
         e.preventDefault();
 
         // Send message
-        chatSocket.send(JSON.stringify({ 'message': message }));
-        setMessage('');
+        this.chatSocket.send(JSON.stringify({ body: this.state.body }));
+        this.setState({ body: '' })
     }
 
-    const handleChange = e => {
+    handleChange = e => {
         e.preventDefault();
-        setMessage(e.target.value);
+        this.setState({ body: e.target.value });
     }
 
-    return (
-        <Form onSubmit={handleSubmit}>
-            <FormControl as="textarea" type="text" id="log" value={log}
-                className="mb-3"
-            />
-            <FormControl type="text" onChange={handleChange} className="mb-1" />
-            <FormControl type="submit" value="Send" />
-        </Form>
-    );
+    render() {
+        return (
+            <Form onSubmit={this.handleSubmit}>
+                <FormControl as="textarea" type="text" id="log" value={this.state.log} className="mb-3" />
+                <FormControl type="text" onChange={this.handleChange} className="mb-1" />
+                <FormControl type="submit" value="Send" />
+            </Form>
+        );
+    }
 }
 export default Messages;
