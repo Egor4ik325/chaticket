@@ -34,7 +34,8 @@ I want it to look similar to the **Telegram web** client app: similar look and f
 Committed branch features:
 
 - [x] Authentication
-- [ ] Store chats and messages in the persistant storage
+- [ ] Store chats in the persistant storage
+- [ ] Store messages
 - [ ] Profile
 - [ ] Make chat-looking UI
 - [ ] Real-time capabilities
