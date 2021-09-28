@@ -7,4 +7,5 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ["id", "chat", "user", "body", "send_time"]
-        read_only_fields = ["id", "chat", "user", "send_time"]
+        # id, user and time are set by the server
+        read_only_fields = ["id", "user", "send_time"]

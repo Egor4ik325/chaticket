@@ -1,7 +1,21 @@
-import React, { Component, useState } from "react";
+import React, { Component, Fragment } from "react";
 import { Form, FormControl } from "react-bootstrap";
 
+import { messageList } from "../adaptors";
 
+// render message from data
+const Message = props => {
+    return (
+        <p>
+            {
+                props.body ?
+                    props.body
+                    :
+                    <Fragment>No body</Fragment>
+            }
+        </p>
+    );
+}
 class Messages extends Component {
     constructor(props) {
         super(props);
@@ -11,7 +25,8 @@ class Messages extends Component {
 
         this.state = {
             log: '',
-            body: ''
+            body: '',
+            messages: null,
         }
 
         this.chatSocket.onmessage = e => {
@@ -22,6 +37,15 @@ class Messages extends Component {
         this.chatSocket.onclose = e => {
             console.error("WebSocket error!");
         }
+    }
+
+    async componentDidMount() {
+        this.setState({
+            messages: await messageList({ chat: this.props.id })
+        });
+        this.setState({
+            log: this.state.messages.map(message => `${message.body}\n`).join('')
+        })
     }
 
     handleSubmit = e => {

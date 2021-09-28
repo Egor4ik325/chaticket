@@ -5,8 +5,13 @@ from .serializers import MessageSerializer
 
 
 class MessageViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filterset_fields = ['chat', 'user']
+    ordering_fields = ['send_time']
+
+    def get_queryset(self):
+        return Message.objects.all()
+
 
 # Filter/pagination retrieving
 # TODO:

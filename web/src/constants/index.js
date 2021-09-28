@@ -11,6 +11,7 @@ export {
 } from "./Chat";
 
 export { USERS_URL } from "./User";
+export { MESSAGE_URL } from "./Message";
 
 export const HOME_PATH = "/";
 export const CHAT_PATH = "/chat";

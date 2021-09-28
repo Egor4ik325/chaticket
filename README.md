@@ -34,12 +34,14 @@ I want it to look similar to the **Telegram web** client app: similar look and f
 Committed branch features:
 
 - [x] Authentication
-- [ ] Store chats in the persistant storage
-- [ ] Store messages
-- [ ] Profile
-- [ ] Make chat-looking UI
+- [x] Store chats in the persistant storage
+- [x] Messages backend
+- [x] Messages frontend
+- [ ] Deploy for presentation
+- [ ] Basic profile
+- [ ] Chat-looking UI
 - [ ] Real-time capabilities
-- [ ] Messages features
+- [ ] Messaging features
 
 ### This project features
 

@@ -14,12 +14,12 @@ class ChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """Handle websocket connection."""
         # Access captured argument from URLRouter
-        chat_id = int(self.scope["url_route"]["kwargs"]["chat_id"])
+        self.chat_id = int(self.scope["url_route"]["kwargs"]["chat_id"])
 
-        if not await self._chat_exists(chat_id):
+        if not await self._chat_exists(self.chat_id):
             await self.close(code=status.HTTP_404_NOT_FOUND)
 
-        self.group_name = f"chat_{chat_id}"
+        self.group_name = f"chat_{self.chat_id}"
 
         # Add currently connected channel to the chat group
         await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -41,7 +41,7 @@ class ChatsConsumer(AsyncWebsocketConsumer):
         )
 
         # Save message into database (for further retrieving)
-        # TODO:
+        await self._save_message(body)
 
     async def chat_message(self, event):
         """Handle broadcast event from the group."""
@@ -58,3 +58,10 @@ class ChatsConsumer(AsyncWebsocketConsumer):
             return True
         except Chat.DoesNotExist:
             return False
+
+    @database_sync_to_async
+    def _save_message(self, body):
+        """Create new message to the database via serializer."""
+        serializer = MessageSerializer(data={"chat": self.chat_id, "body": body})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.scope["user"])

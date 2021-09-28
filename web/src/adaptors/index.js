@@ -23,3 +23,8 @@ export {
     userList,
     userRetrieve
 } from "./User";
+
+export {
+    messageList,
+    messageRetrieve
+} from "./Message";
