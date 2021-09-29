@@ -41,7 +41,8 @@ class ChatsConsumer(AsyncWebsocketConsumer):
         )
 
         # Save message into database (for further retrieving)
-        await self._save_message(body)
+        if body:
+            await self._save_message(body)
 
     async def chat_message(self, event):
         """Handle broadcast event from the group."""

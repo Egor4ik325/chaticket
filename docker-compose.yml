@@ -6,6 +6,7 @@ services:
       - server
       - web
     build: ./proxy
+    restart: always
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
     ports:
