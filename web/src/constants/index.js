@@ -10,6 +10,10 @@ export {
     CHAT_URL
 } from "./Chat";
 
+export {
+    YANDEX_LOGIN_URL
+} from "./Api"
+
 export { USERS_URL } from "./User";
 export { MESSAGE_URL } from "./Message";
 

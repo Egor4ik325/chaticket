@@ -211,8 +211,9 @@ REST_FRAMEWORK = {
 }
 
 # Cross-site (cross-origin) request forgery protection
-CSRF_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_SAMESITE = 'Strict'
+# https://stackoverflow.com/questions/65482931/django-allauth-google-login-not-working-on-ios
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 # * Cookies will be access by JavaScript in order to set X-CSRFToken header
 # Small protection from cross-site scripting (JavaScript injection)
