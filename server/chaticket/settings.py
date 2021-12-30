@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 from environ import Env
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'api',
     'authentication',
@@ -52,10 +53,24 @@ INSTALLED_APPS = [
     'chats',
     'message',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.yandex',
+
     'channels',
     'rest_framework',
     'django_filters',
+    'django_extensions',
 ]
+
+# Site domain will be used in case request is not provided
+SITE_ID = 1
+
+# Required to make request.get_host return the absolute hostname (not relative Docker hostname)
+# request.get_host is used in callback_url for social authentication.
+# the host will be determined based on X_FORWARDED_FOR header (when the server is sitting behind proxy)
+USE_X_FORWARDED_HOST=True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -122,6 +137,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'yandex': {
+        'VERIFIED_EMAIL': True,
+        'APP': {
+            'client_id': env("YANDEX_OAUTH_ID"),
+            'secret': env("YANDEX_OAUTH_PASSWORD"),
+            'key': ''
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -195,3 +225,6 @@ if 'test' in sys.argv:
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'test_db.sqlite3'
     }
+
+# Allauth
+# -------

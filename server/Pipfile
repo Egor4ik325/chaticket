@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
+django = "==3.2"
 channels = "*"
 django-environ = "*"
 channels-redis = "*"
@@ -12,6 +12,8 @@ psycopg2-binary = "*"
 djangorestframework = "*"
 django-filter = "*"
 gunicorn = "*"
+django-allauth = "*"
+django-extensions = "*"
 
 [dev-packages]
 pylint = "*"
